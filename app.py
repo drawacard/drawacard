@@ -1,6 +1,9 @@
-from flask import Flask, render_template
+from flask import Flask, request, render_template
+from elasticsearch import Elasticsearch
 
 app = Flask(__name__)
+elastic = Elasticsearch()
+
 
 @app.route("/")
 def index():
@@ -9,20 +12,21 @@ def index():
 
 @app.route("/search")
 def search():
-    results = [{
-        'name': "Sen Triplets",
-        'colors': ["White", "Blue", "Black"],
-        'supertypes': ["Legendary"],
-        'types': ["Artifact", "Creature"],
-        'subtypes': ["Human", "Wizard"],
-        'rarity': "Mythic Rare",
-        'power': "3",
-        'toughness': "3",
-        'layout': "normal"
-    }]
-
-    return render_template("search.html", results=results)
+    body = {
+        "query": {
+            "term": {"name": request.args.get('query')}
+         }
+    }
+    hits = elastic.search('m14', body=body, size=25)['hits']
+    
+    cards = []
+    total = hits['total']
+    
+    for hit in hits['hits']:
+        cards.append(hit['_source'])
+    
+    return render_template("search.html", total=total, cards=cards)
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)

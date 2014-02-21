@@ -1,3 +1,19 @@
-{% for result in results %}
-    {{ result }}
+Got {{ total }} total hits.
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Power</th>
+        <th>Toughness</th>
+        <th>Mana Cost</th>
+     </tr>
+{% for card in cards %}
+    <tr>
+        <td>{{ card.name }}</td>
+        <td>{{ card.power }}</td>
+        <td>{{ card.toughness }}</td>
+        <td>{{ card.manaCost }}</td>
+    </tr>
 {% endfor %}
+</table>
+
